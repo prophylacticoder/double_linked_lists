@@ -99,23 +99,23 @@ func (l *dList) popBack() (int, error) {
 
 }
 
-func (l *dList) insert(index uint, v int) bool {
+func (l *dList) insert(index uint, v int) error {
 
 	if index > l.getSize() {
-		return false
+		return errors.New("Index out of range.")
 	}
 
 	if l.isEmpty() {
 		l.pushFront(v)
-		return true
+		return nil
 	}
 
 	if index == 0 {
 		l.pushFront(v)
-		return true
+		return nil
 	} else if index == l.getSize()+1 {
 		l.push_back(v)
-		return true
+		return nil
 	}
 
 	pivot := l.sentinel.next
@@ -127,43 +127,43 @@ func (l *dList) insert(index uint, v int) bool {
 	pivot.next.prev = insertionNode
 	pivot.next = insertionNode
 
-	return true
+	return nil
 
 }
 
-func (l *dList) value_at(index uint) (int, bool) {
+func (l *dList) value_at(index uint) (int, error) {
 	if l.isEmpty() || index > l.getSize() {
-		return 0, true
+		return 0, errors.New("Index out of range.")
 	}
 
 	if index == 0 {
 		v := l.sentinel.next.value
-		return v, false
+		return v, nil
 	} else if index == l.getSize() {
 		v := l.sentinel.prev.value
-		return v, false
+		return v, nil
 	}
 	pivot := l.sentinel.next
 	for ; index > 0; index-- {
 		pivot = pivot.next
 	}
 
-	return pivot.value, false
+	return pivot.value, nil
 }
 
-func (l *dList) front() (int, bool) {
-	if v, isEmpty := l.value_at(0); !isEmpty {
-		return v, false
+func (l *dList) front() (int, error) {
+	if v, isEmpty := l.value_at(0); isEmpty != nil {
+		return v, errors.New("List is empty.")
 	}
-	return 0, true
+	return 0, nil
 }
 
-func (l *dList) back() (int, bool) {
+func (l *dList) back() (int, error) {
 	dlSize := l.getSize()
-	if v, isEmpty := l.value_at(dlSize); !isEmpty {
-		return v, false
+	if v, isEmpty := l.value_at(dlSize); isEmpty != nil {
+		return v, errors.New("List is empty.")
 	}
-	return 0, true
+	return 0, nil
 }
 
 func (l *dList) erase(index uint) error {
@@ -320,7 +320,7 @@ func main() {
 	}
 
 	fmt.Printf("\nPushing some elements...")
-	if ok := l.insert(1000, 100); ok {
+	if ok := l.insert(1000, 100); ok != nil {
 		fmt.Printf("\nErro inserting element...\n")
 	}
 
@@ -332,7 +332,7 @@ func main() {
 	fmt.Println("DL size:", l.getSize())
 	fmt.Printf("DList: ")
 	l.printdl()
-	if _, isOutOfRange := l.value_at(999); isOutOfRange {
+	if _, isOutOfRange := l.value_at(999); isOutOfRange != nil {
 		fmt.Printf("\nAt(999) is unreachable.\n")
 	}
 	v, _ := l.value_at(0)
